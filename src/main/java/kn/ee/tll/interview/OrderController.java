@@ -10,20 +10,18 @@ import java.util.Collection;
 @RestController
 public class OrderController {
 
-  // ?
-  @Autowired public OrderService orderService;
+  @Autowired
+  public OrderController(OrderService orderService) {
+    this.orderService = orderService;
+  }
+
+  private final OrderService orderService;
 
   // ?
   @GetMapping("/orders")
   public Collection<OrderEntity> getOrders() {
 
     return orderService.getOrders();
-  }
-
-  @GetMapping("/orders/with-delivery")
-  public Collection<OrderEntity> getOrdersWithDelivery() {
-
-    return orderService.getOrdersWithDelivery();
   }
 
   // ?
@@ -34,7 +32,6 @@ public class OrderController {
       @RequestParam String userLastName,
       @RequestParam String userEmail,
       @RequestParam String userPhone,
-      @RequestParam boolean requiresDelivery,
       @RequestParam String deliveryAddress) {
 
     final var orderEntity = new OrderEntity();
@@ -43,7 +40,8 @@ public class OrderController {
     orderEntity.setUserLastName(userLastName);
     orderEntity.setUserEmail(userEmail);
     orderEntity.setUserPhone(userPhone);
-    orderEntity.setRequiresDelivery(requiresDelivery);
+    // ?
+    orderEntity.setRequiresDelivery(true);
     orderEntity.setDeliveryAddress(deliveryAddress);
 
     orderService.create(orderEntity);
@@ -54,14 +52,15 @@ public class OrderController {
   @GetMapping("/orders/update")
   public OrderEntity updateOrder(
       @RequestParam Long id,
-      @RequestParam String orderNumber,
-      @RequestParam String userFirstName,
-      @RequestParam String userLastName,
-      @RequestParam String userEmail,
-      @RequestParam String userPhone,
+      @RequestParam(required = false) String orderNumber,
+      @RequestParam(required = false) String userFirstName,
+      @RequestParam(required = false) String userLastName,
+      @RequestParam(required = false) String userEmail,
+      @RequestParam(required = false) String userPhone,
+      // ?
       @RequestParam boolean requiresDelivery,
       @RequestParam String deliveryAddress) {
-//?
+    // ?
     final var orderEntity = new OrderEntity();
     orderEntity.setId(id);
     orderEntity.setOrderNumber(orderNumber);
@@ -74,5 +73,12 @@ public class OrderController {
     orderService.update(orderEntity);
 
     return orderEntity;
+  }
+
+  // ? * is it possible to improve?
+  @GetMapping("/orders/with-delivery")
+  public Collection<OrderEntity> getOrdersWithDelivery() {
+
+    return orderService.getOrdersWithDelivery();
   }
 }
